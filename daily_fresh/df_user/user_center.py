@@ -4,7 +4,7 @@ def login(func):
         if request.session.has_key('user_id'):
             return func(request, *args, **kwargs)
         else:
-            red = HttpResponseRedirect('/login/')
+            red = HttpResponseRedirect('/user/login/')
             red.set_cookie('url', request.get_full_path())
             return red
     return login_in

@@ -8,7 +8,7 @@ import user_center
 
 # 首页
 def index(request):
-    return render(request, 'user_info/index.html', {'title': '首页'})
+    return render(request, 'df_goods/index.html', {'title': '首页'})
 
 # 注册
 def register(request):
@@ -25,7 +25,7 @@ def register_handle(request):
 
     # 当两次密码不相同时,重定向到register
     if upwd != upwd2:
-        return redirect('/register/')
+        return redirect('/user/register/')
 
     # 当输入符合条件时，生成UserInfo对象,密码需要加密
     s1 = sha1()
@@ -39,7 +39,7 @@ def register_handle(request):
     user.save()
 
     # 注册成功跳转到登录界面
-    return redirect('/login/')
+    return redirect('/user/login/')
 def register_exist(request):
     # 因为ajax发送的请求方式为get
     uname = request.GET.get('uname')
@@ -117,6 +117,7 @@ def ucenter_info(request):
         'title': '用户中心',
         'uname': request.session['user_name'],
         'uemail': user.uEmail,
+        'page_name': 1,
     }
     return render(request, 'user_info/user_center_info.html', context)
 # 收货地址
@@ -134,6 +135,7 @@ def ucenter_site(request):
     context = {
         'title': '用户中心',
         'user': user,
+        'page_name': 1,
     }
     return render(request, 'user_info/user_center_site.html', context)
 

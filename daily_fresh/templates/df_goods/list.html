@@ -1,0 +1,99 @@
+{%extends 'base.html'%}
+{%block head%}
+{%endblock head%}
+{%block content%}
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+					<li><a href="/glist1_1_1/" class="fruit">新鲜水果</a></li>
+					<li><a href="/glist2_1_1/" class="seafood">海鲜水产</a></li>
+					<li><a href="/glist3_1_1/" class="meet">猪牛羊肉</a></li>
+					<li><a href="/glist4_1_1/" class="egg">禽类蛋品</a></li>
+					<li><a href="/glist5_1_1/" class="vegetables">新鲜蔬菜</a></li>
+					<li><a href="/glist6_1_1/" class="ice">速冻食品</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="/">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		{{type_name.title}}
+		<a href="#">{{typename.title}}</a>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					{%for new in new_list%}
+					<li>
+						<a href="/detail{{new.id}}/"><img src="/static/{{new.gpic}}"></a>
+						<h4><a href="/detail{{new.id}}/">{{new.gtitle}}</a></h4>
+						<div class="prize">￥{{new.gprice}}</div>
+					</li>
+					{%endfor%}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar">
+				{%if pageid == '1'%}
+					<a href="/glist{{type_name.id}}_1_1/" class="active" id="moren">默认</a>
+					<a href="/glist{{type_name.id}}_1_2/" id="price">价格</a>
+					<a href="/glist{{type_name.id}}_1_3/" id="click">人气</a>
+				{%elif pageid == '2'%}
+					<a href="/glist{{type_name.id}}_1_1/" id="moren">默认</a>
+					<a href="/glist{{type_name.id}}_1_2/" id="price" class="active">价格</a>
+					<a href="/glist{{type_name.id}}_1_3/" id="click">人气</a>
+				{%elif pageid == '3'%}
+					<a href="/glist{{type_name.id}}_1_1/" id="moren">默认</a>
+					<a href="/glist{{type_name.id}}_1_2/" id="price">价格</a>
+					<a href="/glist{{type_name.id}}_1_3/" id="click" class="active">人气</a>
+				{%endif%}
+			</div>
+
+			<ul class="goods_type_list clearfix">
+				{%for good in page%}
+				<li>
+					<a href="/detail{{good.id}}/"><img src="/static/{{good.gpic}}"></a>
+					<h4><a href="/detail{{good.id}}/">{{good.gtitle}}</a></h4>
+					<div class="operate">
+						<span class="prize">￥{{good.gprice}}</span>
+						<span class="unit">{{good.gunit}}</span>
+						<a href="#" class="add_goods" title="加入购物车"></a>
+					</div>
+				</li>
+				{%endfor%}
+			</ul>
+			<div class="pagenation">
+				{%if page.has_previous%}
+					<a href="/glist{{tid}}_{{page.number|add:-1}}_{{pageid}}/"><上一页</a>
+				{%endif%}
+				{%for i in page.paginator.page_range%}
+					{%if i == page.number%}
+						<a href="#" class="active">{{i}}</a>
+					{%else%}
+						<a href="/glist{{tid}}_{{i}}_{{pageid}}/">{{i}}</a>
+					{%endif%}
+				{%endfor%}
+				{%if page.has_next%}
+					<a href="/glist{{tid}}_{{page.number|add:1}}_{{pageid}}/">下一页></a>
+				{%endif%}
+			</div>
+		</div>
+	</div>
+{%endblock content%}
