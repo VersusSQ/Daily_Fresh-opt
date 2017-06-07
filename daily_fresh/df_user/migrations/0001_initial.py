@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='User_Info',
+            name='UserInfo',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('uName', models.CharField(max_length=20)),
@@ -23,8 +23,5 @@ class Migration(migrations.Migration):
                 ('uTel', models.CharField(default=b'', max_length=20)),
                 ('isdelete', models.BooleanField(default=False)),
             ],
-            options={
-                'db_table': 'user_info',
-            },
         ),
     ]

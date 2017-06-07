@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for daily_fresh project.
 
@@ -11,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +41,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'df_user',
     'df_goods',
+    'df_cart',
+    'df_order',
     'tinymce',
+    'haystack',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -51,6 +56,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'df_user.UrlMiddleware.url',
 )
 
 ROOT_URLCONF = 'daily_fresh.urls'
@@ -111,10 +117,18 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/goods')
+
 TINYMCE_DEFAULT_CONFIG = {
     'theme': 'advanced',
     'width': 600,
     'height': 400,
 }
 
-
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 18

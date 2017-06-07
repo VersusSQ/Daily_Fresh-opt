@@ -1,38 +1,35 @@
-{%extends 'base.html'%}
-{%block content%}
-	<div class="navbar_con">
-		<div class="navbar clearfix">
-			<div class="subnav_con fl">
-				<h1>全部商品分类</h1>	
-				<span></span>
-				{{type}}
-				<ul class="subnav">
-					<li><a href="/glist1_1_1/" class="fruit">新鲜水果</a></li>
-					<li><a href="/glisr2_1_1/" class="seafood">海鲜水产</a></li>
-					<li><a href="/glist3_1_1/" class="meet">猪牛羊肉</a></li>
-					<li><a href="/glist4_1_1/" class="egg">禽类蛋品</a></li>
-					<li><a href="/glist5_1_1/" class="vegetables">新鲜蔬菜</a></li>
-					<li><a href="/glist6_1_1/" class="ice">速冻食品</a></li>
-				</ul>
-			</div>
-			<ul class="navlist fl">
-				<li><a href="/">首页</a></li>
-				<li class="interval">|</li>
-				<li><a href="">手机生鲜</a></li>
-				<li class="interval">|</li>
-				<li><a href="">抽奖</a></li>
-			</ul>
-		</div>
-	</div>
+{%extends 'df_goods/base.html'%}
 
-	<div class="breadcrumb">
-		<a href="#">全部分类</a>
-		<span>></span>
-		<a href="#">{{type.title}}</a>
-		<span>></span>
-		<a href="#">商品详情</a>
-	</div>
+{%block head%}
+	<script>
+		function calcTotal() {
+			price=parseFloat($('.show_pirze > em').text());
+			count=parseInt($('.num_show').val());
+			$('.total > em').text((price*count).toFixed(2));
+		}
 
+		$(function () {
+			$('.num_show').blur(function () {
+				calcTotal();
+			});
+			$('.add').click(function () {
+				$('.num_show').val(parseInt($('.num_show').val())+1);
+				calcTotal();
+			});
+			$('.minus').click(function () {
+				count=parseInt($('.num_show').val())-1;
+				if(count<=1){
+					$('.num_show').val(1);
+				}else{
+					$('.num_show').val(count);
+				}
+				calcTotal();
+			});
+		});
+	</script>
+{%endblock head%}
+
+{%block content1%}
 	<div class="goods_detail_con clearfix">
 		<div class="goods_detail_pic fl"><img src="/static/{{goods.gpic}}"></div>
 
@@ -58,36 +55,46 @@
 			</div>
 		</div>
 	</div>
+{%endblock content1%}
 
-	<div class="main_wrap clearfix">
-		<div class="l_wrap fl clearfix">
-			<div class="new_goods">
-				<h3>新品推荐</h3>
-				<ul>
-					{%for new in newlist%}
-					<li>
-						<a href="/detail{{new.id}}/"><img src="/static/{{new.gpic}}"></a>
-						<h4><a href="/detail{{new.id}}/">{{new.gtitle}}</a></h4>
-						<div class="prize">￥{{new.gprice}}</div>
-					</li>
-					{%endfor%}
-				</ul>
-			</div>
+{%block content2%}
+	<div class="r_wrap fr clearfix">
+		<ul class="detail_tab clearfix">
+			<li class="active">商品介绍</li>
+			<li>评论</li>
+		</ul>
+
+		<div class="tab_content">
+			<dl>
+				<dt>商品详情：</dt>
+				<dd>{{goods.gcontent|safe}}</dd>
+			</dl>
 		</div>
 
-		<div class="r_wrap fr clearfix">
-			<ul class="detail_tab clearfix">
-				<li class="active">商品介绍</li>
-				<li>评论</li>
-			</ul>
-
-			<div class="tab_content">
-				<dl>
-					<dt>商品详情：</dt>
-					<dd>{{goods.gcontent|safe}}</dd>
-				</dl>
-			</div>
-
-		</div>
 	</div>
-{%endblock content%}
+	<div class="add_jump"></div>
+	<script type="text/javascript">
+		var $add_x = $('#add_cart').offset().top;
+		var $add_y = $('#add_cart').offset().left;
+
+		var $to_x = $('#show_count').offset().top;
+		var $to_y = $('#show_count').offset().left;
+
+		$('#add_cart').click(function(){
+			$.get('/cart/add{{goods.id}}_'+$('.num_show').val()+'/',function (data) {
+				if(data.islogin==0){
+					//alert('请登录');
+					location.href='/user/login/';
+					return;
+				}else {
+					$('#show_count').html(data.count);
+				}
+
+				$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+					.animate({'left': $to_y+7, 'top': $to_x+7},"fast", function() {
+				     $(".add_jump").fadeOut('fast');
+				});
+			});
+		});
+	</script>
+{%endblock content2%}

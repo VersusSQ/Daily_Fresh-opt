@@ -1,0 +1,143 @@
+{%extends 'base.html'%}
+{%block head%}
+<script>
+	function calc_total() {
+   //统计个数
+		count = $('.cart_list_td').length;
+		$('.total_count em').text(count);
+		$('.settlements .col03 b').text(count);
+		//计算小计与总计
+		total=0;
+		$('.cart_list_td').each(function () {
+			price = parseFloat($(this).children('.col05').children('em').text());
+			count = $(this).find('.num_show').val();
+			total1 = price * count;
+			$(this).children('.col07').text(total1.toFixed(2)+'元');
+			//prop('checked')当是勾选状态时，返回值为true
+			if($(this).children('.col01').children('input').prop('checked')){
+				total += total1;
+			}
+		});
+		$('.settlements .col03 em').text(total.toFixed(2));
+	}
+
+	function del(cart_id){
+	    if(confirm('确定要删除吗?')){
+	        $.get('/cart/delete/', {'id': cart_id}, function(data){
+	           if(data.result == 'ok'){
+				   $('#'+cart_id).remove();
+	               calc_total();
+			   }
+			});
+		}
+	}
+
+
+	$(function(){
+	    calc_total();
+
+	    //全选勾选
+		//先判断状态去修改所有单个勾选框的状态，再计算
+		$('#click_all').change(function(){
+		    //其他所有的checkbox的'checked'状态为全选勾选框的checked的状态
+			//prop('checked', true/false)
+		    $(':checkbox:not(#check_all)').prop('checked',$(this).prop('checked'));
+		    calc_total();
+
+		});
+
+		//单个勾选
+		//当勾选状态发生改变的时候，计算结果就需改变，最后判断是否所有的都是勾选状态，去修改全选的状态
+		$('.checkbox:not(#click_all)').change(function(){
+		    calc_total();
+		    //checkbox中除全选的选择框个数＝＝选择状态是checked的除全选的个数
+		    if($('.checkbox:not(#click_all)').length == $('.checked:not(#click_all)').length){
+		        $('#click_all').prop('checked', true)
+			}
+			else{
+		        $('#click_all').prop('checked', false)
+			}
+		});
+
+		//+1
+		//与数量改变关联
+		$('.add').click(function(){
+		    count = parseInt($(this).next().val());
+		    count += 1;
+		    $(this).next().val(count).blur();
+		});
+
+		//-1
+		//与数量改变关联
+		$('.minus').click(function(){
+		    count = parseInt($(this).next().val());
+		    count += 1;
+			$(this).next().val(count).blur();
+		});
+
+		//数量改变
+		$('.num_show').blur(function(){
+		    count = parseInt($(this).val());
+		    //当前的所有父级及祖父级中class为col03的标签的所有同辈元素的子元素为
+		    kucun = parseInt($(this).parents('.col03').prevAll().children('.num_show'));
+		    if(count >= kucun){
+		        count = kucun;
+			}
+			if(count <= 1){
+		        count = 1;
+			}
+			//提交到数据库
+			id=$(this).parents('.col06').prevAll('input').val();
+        	input_count=$(this);
+        	$.get('/cart/count_change/',{'id':id,'count':count},function (data) {
+            	input_count.val(data.count);
+            	calc_total();
+        });
+
+		});
+	});
+</script>
+{%endblock head%}
+
+{%block content%}
+	<div class="total_count">全部商品<em>2</em>件</div>	
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+	<form method="get" action="/order/">
+	{%for cart in cart_list%}
+		<input type="hidden" id='' value="{{ cart.id }}">
+		<ul class="cart_list_td clearfix" id="{{cart.id}}">
+			<!--当提交表单时，会提交所有的name-value作为键值对的数据-->
+			<li class="col01"><input type="checkbox" checked="checked" name="cart_id" value="{{cart.id}}"></li>
+			<li class="col02"><img src="/static/{{cart.goods.gpic}}"></li>
+			<li class="col03">{{cart.goods.gtitle}}<br>库存<em>{{cart.goods.ginventory}}</em></li>
+			<li class="col04">{{cart.goods.gunit}}</li>
+			<li class="col05"><em>{{cart.goods.gprice}}</em>元</li>
+			<li class="col06">
+				<div class="num_add">
+					<a href="javascript:;" class="add fl">+</a>
+					<input type="text" class="num_show fl" value="{{cart.count}}">
+					<a href="javascript:;" class="minus fl">-</a>
+				</div>
+			</li>
+			<li class="col07"></li>
+			<li class="col08"><a href="javascript:del({{cart.id}});">删除</a></li>
+		</ul>
+ 	{% empty %}
+		暂未添加商品
+	{%endfor%}
+
+		<ul class="settlements">
+			<li class="col01"><input type="checkbox" checked="checked" id="click_all"></li>
+			<li class="col02">全选</li>
+			<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
+			<li class="col04"><input type='submit' value="去结算"></li>
+		</ul>
+	</form>
+{%endblock content%}

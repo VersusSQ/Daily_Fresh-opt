@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-class User_Info(models.Model):
+class UserInfo(models.Model):
     uName = models.CharField(max_length=20)
     uPwd = models.CharField(max_length=40)
     uEmail = models.CharField(max_length=30)
@@ -12,7 +12,5 @@ class User_Info(models.Model):
     uTel = models.CharField(max_length=20, default='')
     isdelete = models.BooleanField(default=False)
 
-    class Meta:
-        db_table = 'user_info'
 
 

@@ -1,9 +1,10 @@
-#coding=utf-8
+# coding=utf-8
 from django.shortcuts import render, redirect
 from models import *
 from hashlib import sha1
 from django.http import JsonResponse, HttpResponseRedirect
 import user_center
+from df_goods.models import *
 # Create your views here.
 
 # 首页
@@ -32,18 +33,18 @@ def register_handle(request):
     s1.update(upwd)
     upwd3 = s1.hexdigest()
 
-    user = User_Info()
+    user = UserInfo()
     user.uName = uname
     user.uPwd = upwd3
     user.uEmail = uemail
     user.save()
 
     # 注册成功跳转到登录界面
-    return redirect('/user/login/')
+    return HttpResponseRedirect('/user/login/')
 def register_exist(request):
     # 因为ajax发送的请求方式为get
     uname = request.GET.get('uname')
-    count = User_Info.objects.filter(uName=uname).count()
+    count = UserInfo.objects.filter(uName=uname).count()
     # 返回一个json形式的数据
     return JsonResponse({'count': count})
 
@@ -60,7 +61,7 @@ def login_handle(request):
 
     # 根据获取的用户姓名,在数据库中判断是否存在
     # 返回的是一个列表,列表中的元素都是符合条件的数据
-    user = User_Info.objects.filter(uName=uname)
+    user = UserInfo.objects.filter(uName=uname)
     if len(user) == 1:
         # 说明用户存在,此时判断密码,需加密
         s1 = sha1()
@@ -70,7 +71,7 @@ def login_handle(request):
             # 此时先获取cookie,目的：可以直接跳转到申请登录的界面,而不是每次都是主页
             # 设置cookie,在当需要在某一个界面获取登录用户信息时创建
             # 当不存在时，则默认跳转地址为首页的url/
-            url = request.COOKIES.get('url', '/')
+            url = request.COOKIES.get('red_url', '/')
             # 生成一个HttpResponseRedirect对象,参数为跳转的地址
             red = HttpResponseRedirect(url)
             # 成功获取跳转地址后,防止以后直接登录造成影响
@@ -106,24 +107,36 @@ def login_handle(request):
 def logout(request):
     # 退出登录时，需要删除创建好的session
     request.session.flush()
-    return redirect('/')
+    # return redirect('/')
+    return HttpResponseRedirect('/')
+
 
 # 用户中心
 # 个人信息
 @user_center.login
 def ucenter_info(request):
-    user = User_Info.objects.get(id=request.session.get('user_id'))
+    user = UserInfo.objects.get(id=request.session.get('user_id'))
+    goods_id = request.COOKIES.get('record')
+    goods_list = []
+    print goods_id
+    if goods_id:
+        goods = goods_id.split(',')
+        print goods
+        for i in goods:
+            goods_list.append(GoodsInfo.objects.get(id=int(i)))
+
     context = {
         'title': '用户中心',
         'uname': request.session['user_name'],
         'uemail': user.uEmail,
         'page_name': 1,
+        'goods_list': goods_list,
     }
     return render(request, 'user_info/user_center_info.html', context)
 # 收货地址
 @user_center.login
 def ucenter_site(request):
-    user = User_Info.objects.get(id=request.session['user_id'])
+    user = UserInfo.objects.get(id=request.session['user_id'])
     # 当请求方式为post时，才是需要更新用户的相关信息
     if request.method == 'POST':
         info = request.POST

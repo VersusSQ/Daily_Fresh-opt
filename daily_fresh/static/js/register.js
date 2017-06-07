@@ -1,14 +1,12 @@
 $(function(){
-	// 用来标记每个字段的校验是否正确
-	// true表示默认字段信息为不符合条件的
+
 	var error_name = true;
 	var error_password = true;
 	var error_check_password = true;
 	var error_email = true;
-	// 用来标记勾选的,默认false表示,前台显示为勾选的
 	var error_check = false;
 
-	//　当id为user_name的标签失去焦点时，执行函数check_user_name()
+
 	$('#user_name').blur(function() {
 		check_user_name();
 	});
@@ -26,11 +24,9 @@ $(function(){
 	});
 
 	$('#allow').click(function() {
-		// 判断当前是否处于被选中状态
 		if($(this).is(':checked'))
 		{
 			error_check = false;
-			// 同级的span标签
 			$(this).siblings('span').hide();
 		}
 		else
@@ -42,7 +38,6 @@ $(function(){
 	});
 
 	function check_user_name(){
-		// val()获取当前表单input标签的值
 		var len = $('#user_name').val().length;
 		if(len<5||len>20)
 		{
@@ -52,12 +47,9 @@ $(function(){
 		}
 		else
 		{
-            $('#user_name').next().hide();
-			// ajax发送http请求,自动发送,在后端views处判断，该用户名是否存在,返回查找数据库的结果
-			$.get('/register_exist/?uname='+$('#user_name').val(),function (data) {
+            $.get('/user/register_exist/?uname='+$('#user_name').val(),function (data) {
 				if(data.count==1){
-					$('#user_name').next().html('用户名已经存在')
-					$('#user_name').next().show();
+					$('#user_name').next().html('用户名已经存在').show();
 					error_name = true;
 				}else{
 					$('#user_name').next().hide();
@@ -110,16 +102,14 @@ $(function(){
 		}
 		else
 		{
-			$('#email').next().html('你输入的邮箱格式不正确');
+			$('#email').next().html('你输入的邮箱格式不正确')
 			$('#email').next().show();
 			error_check_password = true;
 		}
 
 	}
 
-	// submit(),表示出发submit事件触发的函数
 	$('#reg_form').submit(function() {
-
 		check_user_name();
 		check_pwd();
 		check_cpwd();
@@ -136,4 +126,4 @@ $(function(){
 
 	});
 
-});
+})
