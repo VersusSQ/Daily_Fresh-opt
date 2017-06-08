@@ -5,6 +5,8 @@ from hashlib import sha1
 from django.http import JsonResponse, HttpResponseRedirect
 import user_center
 from df_goods.models import *
+from df_order.models import *
+from django.core.paginator import Paginator
 # Create your views here.
 
 # 首页
@@ -151,4 +153,22 @@ def ucenter_site(request):
         'page_name': 1,
     }
     return render(request, 'user_info/user_center_site.html', context)
+
+@user_center.login
+def ucenter_order(request, pindex):
+    order_list = OrderInfo.objects.filter(user_id=request.session['user_id']).order_by('oIsPay')
+    p = Paginator(order_list, 2)
+    page = p.page(int(pindex))
+    context = {
+        'page': page,
+    }
+    return render(request, 'user_info/user_center_order.html', context)
+
+
+def pay(request):
+    pid = request.POST.get('order_id')
+    p = OrderInfo.objects.get(oid=pid)
+    p.oIsPay = True
+    p.save()
+    return redirect('/user/ucenter_order_1/')
 

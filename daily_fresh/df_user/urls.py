@@ -11,4 +11,6 @@ urlpatterns = [
     url('^logout/$', views.logout),
     url('^ucenter_info/$', views.ucenter_info),
     url('^ucenter_site/$', views.ucenter_site),
+    url('^ucenter_order_(\d+)/$', views.ucenter_order),
+    url('^pay/$', views.pay),
 ]

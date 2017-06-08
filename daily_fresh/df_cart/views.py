@@ -17,7 +17,7 @@ def cart(request):
     }
     return render(request, 'df_cart/cart.html', context)
 
-@login
+
 def add(request, gid, count):
     carts = CartInfo.objects.filter(goods_id=gid).filter(user_id=request.session['user_id'])
     if len(carts):
@@ -47,9 +47,9 @@ def delete(request):
 def change(request):
     id = request.GET.get('id')
     count = request.GET.get('count')
-
     cart = CartInfo.objects.get(id=int(id))
     cart.count = int(count)
+    print count
     cart.save()
     return JsonResponse({'count', cart.count})
 

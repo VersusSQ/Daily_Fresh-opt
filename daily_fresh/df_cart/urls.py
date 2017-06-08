@@ -4,6 +4,6 @@ import views
 urlpatterns = [
     url('^$', views.cart),
     url('^add(\d+)_(\d+)/$', views.add),
-    url('^change/$', views.change),
+    url('^count_change/$', views.change),
     url('^delete/$', views.delete),
 ]

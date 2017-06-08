@@ -10,7 +10,7 @@
 		total=0;
 		$('.cart_list_td').each(function () {
 			price = parseFloat($(this).children('.col05').children('em').text());
-			count = $(this).find('.num_show').val();
+			count = parseInt($(this).find('.num_show').val());
 			total1 = price * count;
 			$(this).children('.col07').text(total1.toFixed(2)+'元');
 			//prop('checked')当是勾选状态时，返回值为true
@@ -38,7 +38,7 @@
 
 	    //全选勾选
 		//先判断状态去修改所有单个勾选框的状态，再计算
-		$('#click_all').change(function(){
+		$('#check_all').change(function(){
 		    //其他所有的checkbox的'checked'状态为全选勾选框的checked的状态
 			//prop('checked', true/false)
 		    $(':checkbox:not(#check_all)').prop('checked',$(this).prop('checked'));
@@ -48,14 +48,14 @@
 
 		//单个勾选
 		//当勾选状态发生改变的时候，计算结果就需改变，最后判断是否所有的都是勾选状态，去修改全选的状态
-		$('.checkbox:not(#click_all)').change(function(){
+		$(':checkbox:not(#check_all)').change(function(){
 		    calc_total();
 		    //checkbox中除全选的选择框个数＝＝选择状态是checked的除全选的个数
-		    if($('.checkbox:not(#click_all)').length == $('.checked:not(#click_all)').length){
-		        $('#click_all').prop('checked', true)
+		    if($(':checkbox:not(#check_all)').length == $(':checked:not(#check_all)').length){
+		        $('#check_all').prop('checked', true)
 			}
 			else{
-		        $('#click_all').prop('checked', false)
+		        $('#check_all').prop('checked', false)
 			}
 		});
 
@@ -70,30 +70,29 @@
 		//-1
 		//与数量改变关联
 		$('.minus').click(function(){
-		    count = parseInt($(this).next().val());
-		    count += 1;
-			$(this).next().val(count).blur();
+		    count = parseInt($(this).prev().val());
+		    count -= 1;
+			$(this).prev().val(count).blur();
 		});
 
 		//数量改变
 		$('.num_show').blur(function(){
 		    count = parseInt($(this).val());
-		    //当前的所有父级及祖父级中class为col03的标签的所有同辈元素的子元素为
-		    kucun = parseInt($(this).parents('.col03').prevAll().children('.num_show'));
+		    //当前的所有父级及祖父级中class为col06的标签的所有同辈元素的03的标签的子元素为
+		    kucun = parseInt($(this).parents('.col06').prevAll('.col03').children('em').text());
 		    if(count >= kucun){
 		        count = kucun;
 			}
 			if(count <= 1){
 		        count = 1;
 			}
+			$(this).val(count);
 			//提交到数据库
-			id=$(this).parents('.col06').prevAll('input').val();
-        	input_count=$(this);
-        	$.get('/cart/count_change/',{'id':id,'count':count},function (data) {
-            	input_count.val(data.count);
-            	calc_total();
-        });
-
+			id = parseInt($(this).parents('.col06').prevAll('input').val());
+        	$.get('/cart/count_change/',{'id':id,'count':count},function (data){
+        	    $(this).val(data.count);
+        	});
+        	calc_total();
 		});
 	});
 </script>
@@ -111,8 +110,8 @@
 	</ul>
 	<form method="get" action="/order/">
 	{%for cart in cart_list%}
-		<input type="hidden" id='' value="{{ cart.id }}">
 		<ul class="cart_list_td clearfix" id="{{cart.id}}">
+			<input type="hidden" value="{{ cart.id }}">
 			<!--当提交表单时，会提交所有的name-value作为键值对的数据-->
 			<li class="col01"><input type="checkbox" checked="checked" name="cart_id" value="{{cart.id}}"></li>
 			<li class="col02"><img src="/static/{{cart.goods.gpic}}"></li>
@@ -134,7 +133,7 @@
 	{%endfor%}
 
 		<ul class="settlements">
-			<li class="col01"><input type="checkbox" checked="checked" id="click_all"></li>
+			<li class="col01"><input type="checkbox" checked="checked" id="check_all"></li>
 			<li class="col02">全选</li>
 			<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
 			<li class="col04"><input type='submit' value="去结算"></li>
