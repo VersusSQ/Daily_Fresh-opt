@@ -27,7 +27,7 @@ SECRET_KEY = 'k^ro^n-zerh==%a2gt_5m8$=$n2f^ge&0@7+a$24yja-g)&8)='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', ]
 
 
 # Application definition
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'daily_fresh.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'daily_fresh',
+        'NAME': 'fd',
         'HOST': 'localhost',
         'PORT': '3306',
         'USER': 'root',
@@ -112,6 +112,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+STATIC_ROOT = '/var/www/daily_fresh/static/'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
